@@ -1,0 +1,42 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+const int fsrPin = A0;
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  Serial.begin(9600);
+}
+
+void loop() {
+  int fsrValue = analogRead(fsrPin); 
+
+  // FILTRO DE RUIDO: Si el valor salta por estática entre 0 y 4, forzamos a que sea 0.
+  if (fsrValue < 5) {
+    fsrValue = 0;
+  }
+
+  String categoria = "";
+
+  if (fsrValue < 100) {
+    categoria = "Muy poco peso    "; 
+  } else if (fsrValue >= 100 && fsrValue < 200) {
+    categoria = "Huevo #A     "; 
+  } else if (fsrValue >= 200 && fsrValue < 450) {
+    categoria = "Huevo #AA    ";
+  } else {
+    categoria = "Huevo #AAA   ";
+  }
+
+  lcd.setCursor(0, 0);
+  lcd.print(categoria);
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Valor: ");
+  lcd.print(fsrValue);
+  lcd.print("   "); 
+  
+  delay(200); 
+}
